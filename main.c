@@ -13,7 +13,7 @@ int main() {
     drawRect(1, 16, MAX_X - 2, MAX_Y - 2 - 15, bgcolor);
     drawHollowRect(0, 15, MAX_X - 1, MAX_Y - 1 - 15, RED);
     initSnake(mysnake, GREEN, 3);
-    placeFood(mysnake->head->size, bgcolor);
+    placeFood(mysnake->head->size, 0);
     while(1) {
         /*if (REG_TM0D == 0) {
             moveSnake(mysnake);
@@ -29,6 +29,7 @@ int main() {
             updateSnakeDirection(mysnake, right);
         }
 
+        //default 50
         for (int i = 0; i < 50; i++) {
             while(SCANLINECOUNTER > 160);
             while(SCANLINECOUNTER < 160);

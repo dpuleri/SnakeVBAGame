@@ -103,7 +103,7 @@ void moveSnake(snake* mysnake, u16 bgcolor) {
         nodeMoving->size = mysnake->head->size;
         num2lengthen--;
         if (!num2lengthen) {
-            placeFood(mysnake->head->size, bgcolor);
+            placeFood(mysnake->head->size, 0);
         }
     } else {
         nodeMoving = mysnake->tail;
@@ -129,6 +129,7 @@ void moveSnake(snake* mysnake, u16 bgcolor) {
     }
 
     if (hasEatenFood(nodeMoving)) {
+        placeFood(mysnake->head->size, bgcolor);
         num2lengthen += 4;
     } else if (isCollided(nodeMoving, bgcolor)) {
         nodeMoving->color = GRAY;
@@ -169,15 +170,17 @@ void updateSnakeDirection(snake* mysnake, direction newdirection) {
 }
 
 //places the food in a random place on the map
+//if the bgcolor != 0 then undo last food palcement
 void placeFood(int nodeSize, u16 bgcolor) {
     static int x = 0;
     static int y = 0;
-    if (x != 0 && y != 0) {
+    if (bgcolor) {
         drawRect(x, y, nodeSize, nodeSize, bgcolor);
+    } else {
+        x = (rand() % (MAX_X - nodeSize - 1)) + 1;
+        y = (rand() % (MAX_Y - nodeSize - 15 - 1)) + 15;
+        drawRect(x, y, nodeSize, nodeSize, FOOD_COLOR);
     }
-    x = (rand() % (MAX_X - nodeSize - 1)) + 1;
-    y = (rand() % (MAX_Y - nodeSize - 15 - 1)) + 15;
-    drawRect(x, y, nodeSize, nodeSize, FOOD_COLOR);
 }
 
 
