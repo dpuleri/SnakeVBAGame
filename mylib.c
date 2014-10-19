@@ -3,14 +3,15 @@
 #include <stdlib.h>
 #include "mylib.h"
 
-
+u16* videoBuffer = (u16*) VID_BFFR; //define global var
+int num2lengthen = 0;
 
 
 void initSnake(snake* mysnake, u16 color, int snakeSize) {
     node* head = malloc(sizeof(*head));;
     node* prevNode = head;
-    head->x = 240 / 2;
-    head->y = 160 / 2;
+    head->x = MAX_X / 2 - 1;
+    head->y = MAX_Y / 2 - 1;
     head->color = color;
     head->size = snakeSize;
     printSnakeNode(head);
@@ -91,7 +92,6 @@ void plotLine(int x0, int y0, int x1, int y1, u16 color) {
 
 //var to count if the snake is being lengthened
 void moveSnake(snake* mysnake, u16 bgcolor) {
-    static int num2lengthen = 0;
     static int hasCollided = 0;
 
     node* nodeMoving;
@@ -102,7 +102,9 @@ void moveSnake(snake* mysnake, u16 bgcolor) {
         nodeMoving = malloc(sizeof(*nodeMoving));
         nodeMoving->size = mysnake->head->size;
         num2lengthen--;
-
+        if (!num2lengthen) {
+            placeFood(mysnake->head->size, bgcolor);
+        }
     } else {
         nodeMoving = mysnake->tail;
         mysnake->tail = mysnake->tail->previous;
@@ -161,8 +163,21 @@ int isCollided(node* curNode, u16 bgcolor) {
     return 0;
 }
 
+//updates the direction in which the snake is moving
 void updateSnakeDirection(snake* mysnake, direction newdirection) {
     mysnake->direction = newdirection;
+}
+
+//places the food in a random place on the map
+void placeFood(int nodeSize, u16 bgcolor) {
+    static int x = 0;
+    static int y = 0;
+    if (x != 0 && y != 0) {
+        drawRect(x, y, nodeSize, nodeSize, bgcolor);
+    }
+    x = (rand() % (MAX_X - nodeSize - 1)) + 1;
+    y = (rand() % (MAX_Y - nodeSize - 15 - 1)) + 15;
+    drawRect(x, y, nodeSize, nodeSize, FOOD_COLOR);
 }
 
 

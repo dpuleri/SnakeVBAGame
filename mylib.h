@@ -1,12 +1,17 @@
 #ifndef MYLIB_H_
 #define MYLIB_H_
 
+typedef unsigned short u16; //shortcut for 16bit unsigned
+
 // *** Display Stuff ===================================================
 
 #define REG_DISPCTL (* (u16*) (0x4000000))
 #define MODE3 3
 #define BG2_ENABLE (1<<10)
 #define VID_BFFR ((u16*) (0x6000000))
+extern u16* videoBuffer;
+#define MAX_X (240)
+#define MAX_Y (160)
 
 // *** Colors =========================================================
 
@@ -49,8 +54,8 @@
 
 #define BUTTONS *(volatile unsigned int *)0x4000130
 
-
-typedef unsigned short u16; //shortcut for 16bit unsigned
+// *** Other =========================================================
+extern int num2lengthen;
 
 
 /* Direction Enum */
@@ -95,5 +100,6 @@ void moveSnake(snake*, u16);
 int hasEatenFood(node*);
 int isCollided(node*, u16);
 void updateSnakeDirection(snake*, direction);
+void placeFood(int, u16);
 
 #endif
