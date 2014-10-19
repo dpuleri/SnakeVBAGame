@@ -44,6 +44,12 @@ void setPixel(int x, int y, u16 color) {
     //*VID_BFFR = color;
 }
 
+//gets the color of a pixel
+u16 getPixelColor(int x, int y) {
+    int offset = (y * 240) + x;
+    return *((u16*) (VID_BFFR + offset));
+}
+
 void drawRect(int x, int y, int width, int height, u16 color) {
     for (int i = x; i < (x + width); i++) {
         for (int j = y; j < (y + height); j++) {
@@ -84,14 +90,17 @@ void plotLine(int x0, int y0, int x1, int y1, u16 color) {
 }
 
 //var to count if the snake is being lengthened
-static int num2lengthen = 0;
 void moveSnake(snake* mysnake, u16 bgcolor) {
+    static int num2lengthen = 0;
+    static int hasCollided = 0;
 
     node* nodeMoving;
 
-    if (num2lengthen) {
+    if (hasCollided) {
+        return;
+    } else if (num2lengthen) {
         nodeMoving = malloc(sizeof(*nodeMoving));
-        nodeMoving->size = mysnake->size;
+        nodeMoving->size = mysnake->head->size;
         num2lengthen--;
 
     } else {
@@ -108,19 +117,52 @@ void moveSnake(snake* mysnake, u16 bgcolor) {
     nodeMoving->y = mysnake->head->y;
 
     if (mysnake->direction == up) {
-        nodeMoving->y = mysnake->head->y + mysnake->head->size;
-    } else if (mysnake->direction == down) {
         nodeMoving->y = mysnake->head->y - mysnake->head->size;
+    } else if (mysnake->direction == down) {
+        nodeMoving->y = mysnake->head->y + mysnake->head->size;
     } else if (mysnake->direction == left) {
         nodeMoving->x = mysnake->head->x - mysnake->head->size;
     } else {
         nodeMoving->x = mysnake->head->x + mysnake->head->size;
+    }
+
+    if (hasEatenFood(nodeMoving)) {
+        num2lengthen += 4;
+    } else if (isCollided(nodeMoving, bgcolor)) {
+        nodeMoving->color = GRAY;
+        hasCollided = 1;
     }
     printSnakeNode(nodeMoving);
 
     mysnake->head->previous = nodeMoving;
     nodeMoving->next = mysnake->head;
     mysnake->head = nodeMoving;
+}
+
+int hasEatenFood(node* curNode) {
+    for (int i = curNode->x; i < (curNode->x + curNode->size); i++) {
+        for (int j = curNode->y; j < (curNode->y + curNode->size); j++) {
+            if (getPixelColor(i, j) == FOOD_COLOR) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+int isCollided(node* curNode, u16 bgcolor) {
+    for (int i = curNode->x; i < (curNode->x + curNode->size); i++) {
+        for (int j = curNode->y; j < (curNode->y + curNode->size); j++) {
+            if (getPixelColor(i, j) != bgcolor) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+void updateSnakeDirection(snake* mysnake, direction newdirection) {
+    mysnake->direction = newdirection;
 }
 
 

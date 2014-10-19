@@ -17,6 +17,16 @@ int main() {
             moveSnake(mysnake);
             REG_TM0D = -0X2000;
         }*/
+        if (KEY_DOWN_NOW(BUTTON_UP) && mysnake->direction != down) {
+            updateSnakeDirection(mysnake, up);
+        } else if (KEY_DOWN_NOW(BUTTON_DOWN) && mysnake->direction != up) {
+            updateSnakeDirection(mysnake, down);
+        } else if (KEY_DOWN_NOW(BUTTON_LEFT) && mysnake->direction != right) {
+            updateSnakeDirection(mysnake, left);
+        } else if (KEY_DOWN_NOW(BUTTON_RIGHT) && mysnake->direction != left) {
+            updateSnakeDirection(mysnake, right);
+        }
+
         for (int i = 0; i < 50; i++) {
             while(SCANLINECOUNTER > 160);
             while(SCANLINECOUNTER < 160);
