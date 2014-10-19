@@ -6,20 +6,22 @@
 
 
 
-void initSnake(snake* mysnake, u16 color) {
+void initSnake(snake* mysnake, u16 color, int snakeSize) {
     node* head = malloc(sizeof(*head));;
     node* prevNode = head;
     head->x = 240 / 2;
     head->y = 160 / 2;
     head->color = color;
+    head->size = snakeSize;
     printSnakeNode(head);
     for (int i = 1; i < 4; i++) {
         node* newNode = malloc(sizeof(*newNode));
         prevNode->next = newNode;
         newNode->previous = prevNode;
-        newNode->x = head->x - i;
+        newNode->x = head->x - (i * snakeSize);
         newNode->y = head->y;
         newNode->color = color;
+        newNode->size = snakeSize;
         prevNode = newNode;
         printSnakeNode(prevNode);
     }
@@ -30,7 +32,8 @@ void initSnake(snake* mysnake, u16 color) {
 }
 
 void printSnakeNode(node* node) {
-    setPixel(node->x, node->y, node->color);
+    //setPixel(node->x, node->y, node->color);
+    drawRect(node->x, node->y, node->size, node->size, node->color);
 }
 
 //sets a pixel
@@ -80,23 +83,38 @@ void plotLine(int x0, int y0, int x1, int y1, u16 color) {
     }
 }
 
+//var to count if the snake is being lengthened
+static int num2lengthen = 0;
 void moveSnake(snake* mysnake, u16 bgcolor) {
-    node* nodeMoving = mysnake->tail;
-    mysnake->tail = mysnake->tail->previous;
-    mysnake->tail->next = NULL;
-    //take care of turning off the tail
-    nodeMoving->color = bgcolor;
-    printSnakeNode(nodeMoving);
+
+    node* nodeMoving;
+
+    if (num2lengthen) {
+        nodeMoving = malloc(sizeof(*nodeMoving));
+        nodeMoving->size = mysnake->size;
+        num2lengthen--;
+
+    } else {
+        nodeMoving = mysnake->tail;
+        mysnake->tail = mysnake->tail->previous;
+        mysnake->tail->next = NULL;
+        //take care of turning off the tail
+        nodeMoving->color = bgcolor;
+        printSnakeNode(nodeMoving);
+    }
+
     nodeMoving->color = mysnake->color;
+    nodeMoving->x = mysnake->head->x;
+    nodeMoving->y = mysnake->head->y;
 
     if (mysnake->direction == up) {
-        nodeMoving->y = mysnake->head->y + 1;
+        nodeMoving->y = mysnake->head->y + mysnake->head->size;
     } else if (mysnake->direction == down) {
-        nodeMoving->y = mysnake->head->y - 1;
+        nodeMoving->y = mysnake->head->y - mysnake->head->size;
     } else if (mysnake->direction == left) {
-        nodeMoving->x = mysnake->head->x - 1;
+        nodeMoving->x = mysnake->head->x - mysnake->head->size;
     } else {
-        nodeMoving->x = mysnake->head->x + 1;
+        nodeMoving->x = mysnake->head->x + mysnake->head->size;
     }
     printSnakeNode(nodeMoving);
 

@@ -39,6 +39,7 @@ typedef enum {
 typedef struct thisNode {
     int x;
     int y;
+    int size; //note this is edge length of square
     u16 color;
     struct thisNode* previous;
     struct thisNode* next;
@@ -56,7 +57,7 @@ typedef struct {
 
 
 
-void initSnake(snake*, u16);
+void initSnake(snake*, u16, int);
 void printSnakeNode(node*);
 void setPixel(int, int, u16);
 void drawRect(int, int, int, int, u16);
