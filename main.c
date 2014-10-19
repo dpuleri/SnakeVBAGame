@@ -1,17 +1,22 @@
 #include <stdlib.h>
 #include "mylib.h"
+#include "text.h"
 
 int main() {
 
+    drawString(1, 5, "Score", WHITE);
 
     u16 bgcolor = BEIGE;
     snake* mysnake = malloc(sizeof(*mysnake));
-    setPixel(1, 1, WHITE);
     REG_TM0D = -0X2000;
     REG_TM0CNT = TM_FREQ_1024 | TM_ON | TM_IRQ;
     //plotLine(12, 12, 50, 50, WHITE);
+    //draw background rectangle
     drawRect(1, 16, MAX_X - 2, MAX_Y - 2 - 15, bgcolor);
+    //draw border rectangle
     drawHollowRect(0, 15, MAX_X - 1, MAX_Y - 1 - 15, RED);
+
+    //init the snake and init food
     initSnake(mysnake, GREEN, 3);
     placeFood(mysnake->head->size, 0);
     while(1) {

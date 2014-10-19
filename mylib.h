@@ -56,6 +56,7 @@ extern u16* videoBuffer;
 
 // *** Other =========================================================
 extern int num2lengthen;
+#define OFFSET(x, y, width) (x * width + y)
 
 
 /* Direction Enum */

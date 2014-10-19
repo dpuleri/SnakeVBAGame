@@ -11,12 +11,12 @@ PROGNAME = Snake
 
 # The object files you want to compile into your program
 # This should be a space (SPACE!) separated list of .o files
-OFILES = main.o mylib.o
+OFILES = main.o mylib.o text.o font.o
 
 # The header files you have created.
 # This is necessary to determine when to recompile for files.
 # This should be a space (SPACE!) separated list of .h files
-HFILES = mylib.h
+HFILES = mylib.h text.h
 
 ################################################################################
 # These are various settings used to make the GBA toolchain work
@@ -25,14 +25,14 @@ HFILES = mylib.h
 
 TOOLDIR  = /usr/local/cs2110-tools
 ARMLIB   = $(TOOLDIR)/arm-thumb-eabi/lib
-CFLAGS   = -Wall -Werror -std=c99 -pedantic 
+CFLAGS   = -Wall -Werror -std=c99 -pedantic
 CFLAGS   += -mthumb-interwork -mlong-calls -nostartfiles -MMD -MP -I $(TOOLDIR)/include
 LDFLAGS = -L $(TOOLDIR)/lib \
 		  -L $(TOOLDIR)/lib/gcc/arm-thumb-eabi/4.4.1/thumb \
 		  -L $(ARMLIB) \
 		  --script $(ARMLIB)/arm-gba.ld
 CDEBUG   = -g -DDEBUG
-CRELEASE = -O2 
+CRELEASE = -O2
 CC       = $(TOOLDIR)/bin/arm-thumb-eabi-gcc
 AS       = $(TOOLDIR)/bin/arm-thumb-eabi-as
 LD       = $(TOOLDIR)/bin/arm-thumb-eabi-ld
