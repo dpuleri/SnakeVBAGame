@@ -93,6 +93,7 @@ typedef struct {
 
 
 
+// *** Prototypes =========================================================
 void initSnake(snake*, u16, int);
 void printSnakeNode(node*);
 void setPixel(int, int, u16);
