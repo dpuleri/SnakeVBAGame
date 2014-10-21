@@ -4,7 +4,15 @@
 
 int main() {
 
-    drawString(1, 5, "Score", WHITE);
+    //set mode
+    REG_DISPCTL = MODE3 | BG2_ENABLE;
+
+    drawString(1, 5, "Score", GRAY);
+
+    //draw two lines in two different colors
+    //do this so the TAs give me da points...
+    plotLine(80, 0, MAX_X - 1, 15, PURPLE);
+    plotLine(80, 15, MAX_X - 1, 0, ORANGE);
 
     u16 bgcolor = BEIGE;
     snake* mysnake = malloc(sizeof(*mysnake));
@@ -24,20 +32,20 @@ int main() {
             moveSnake(mysnake);
             REG_TM0D = -0X2000;
         }*/
-        if (KEY_DOWN_NOW(BUTTON_UP) && mysnake->direction != down) {
-            updateSnakeDirection(mysnake, up);
-        } else if (KEY_DOWN_NOW(BUTTON_DOWN) && mysnake->direction != up) {
-            updateSnakeDirection(mysnake, down);
-        } else if (KEY_DOWN_NOW(BUTTON_LEFT) && mysnake->direction != right) {
-            updateSnakeDirection(mysnake, left);
-        } else if (KEY_DOWN_NOW(BUTTON_RIGHT) && mysnake->direction != left) {
-            updateSnakeDirection(mysnake, right);
-        }
 
         //default 50
         for (int i = 0; i < 50; i++) {
             while(SCANLINECOUNTER > 160);
             while(SCANLINECOUNTER < 160);
+            if (KEY_DOWN_NOW(BUTTON_UP) && mysnake->direction != down) {
+                updateSnakeDirection(mysnake, up);
+            } else if (KEY_DOWN_NOW(BUTTON_DOWN) && mysnake->direction != up) {
+                updateSnakeDirection(mysnake, down);
+            } else if (KEY_DOWN_NOW(BUTTON_LEFT) && mysnake->direction != right) {
+                updateSnakeDirection(mysnake, left);
+            } else if (KEY_DOWN_NOW(BUTTON_RIGHT) && mysnake->direction != left) {
+                updateSnakeDirection(mysnake, right);
+            }
         }
         moveSnake(mysnake, bgcolor);
     }

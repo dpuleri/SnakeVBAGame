@@ -2,8 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "mylib.h"
+#include "text.h"
 
-u16* videoBuffer = (u16*) VID_BFFR; //define global var
+u16* videoBuffer = VID_BFFR; //define global var
 int num2lengthen = 0;
 
 
@@ -39,10 +40,10 @@ void printSnakeNode(node* node) {
 
 //sets a pixel
 void setPixel(int x, int y, u16 color) {
-    int offset = (y * 240) + x;
-    REG_DISPCTL	= MODE3 | BG2_ENABLE;
-    *((u16*) (VID_BFFR + offset)) = color;
-    //*VID_BFFR = color;
+    int offset = OFFSET(x, y, MAX_X);
+    //int offset = (y * MAX_X) + x; //old code
+    //*((u16*) (VID_BFFR + offset)) = color;
+    videoBuffer[offset] = color;
 }
 
 //gets the color of a pixel
@@ -71,28 +72,32 @@ void drawHollowRect(int x, int y, int width, int height, u16 color) {
 }
 
 void plotLine(int x0, int y0, int x1, int y1, u16 color) {
-    int dx = x1 - x0;
-    int dy = y1 - y0;
-
-    int D = (dy << 1) -dx;
-    setPixel(x0, y0, color);
-    int y = y0;
-
-    for (int x = x0 + 1; x <= x1; x++) {
-        if (D > 0) {
-            y = y + 1;
-            setPixel(x, y, color);
-            D += (dy << 1) - (dx << 1);
-        } else {
-            setPixel(x, y, color);
-            D += (dy << 1);
+    int dx = abs(x1 - x0);
+    int sx = SIGN(x1 - x0);
+    int dy = abs(y1 - y0);
+    int sy = SIGN(y1 - y0); 
+    int err = (dx > dy ? dx : (~dy + 1)) >> 1;
+    int e2;
+ 
+    while (x0 != x1 || y0 != y1) {
+        setPixel(x0, y0, color);
+        e2 = err;
+        if (e2 > (~dx + 1)) {
+            err -= dy;
+            x0 += sx;
+        }
+        if (e2 < dy) {
+            err += dx;
+            y0 += sy;
         }
     }
+    setPixel(x1, y1, color);
 }
 
 //var to count if the snake is being lengthened
 void moveSnake(snake* mysnake, u16 bgcolor) {
     static int hasCollided = 0;
+    static int score = 0;
 
     node* nodeMoving;
 
@@ -131,6 +136,8 @@ void moveSnake(snake* mysnake, u16 bgcolor) {
     if (hasEatenFood(nodeMoving)) {
         placeFood(mysnake->head->size, bgcolor);
         num2lengthen += 4;
+        score++;
+        updateScore(score);
     } else if (isCollided(nodeMoving, bgcolor)) {
         nodeMoving->color = GRAY;
         hasCollided = 1;
@@ -181,6 +188,24 @@ void placeFood(int nodeSize, u16 bgcolor) {
         y = (rand() % (MAX_Y - nodeSize - 15 - 1)) + 15;
         drawRect(x, y, nodeSize, nodeSize, FOOD_COLOR);
     }
+}
+
+void updateScore(int score) {
+    drawRect(40, 5, 8 * 5, 7, BLACK);
+    char* scoreStrPtr = int2str(score);
+    drawString(40, 5, scoreStrPtr, WHITE);
+}
+
+char* int2str(int number) {
+    int buffsize = 2; //account for /0 and first char
+    int tmpNum = number;
+    while (tmpNum > 9) {
+        buffsize++;
+        tmpNum /= 10;
+    }
+    char* buffer = malloc(buffsize);
+    sprintf(buffer, "%d", number);
+    return buffer;
 }
 
 

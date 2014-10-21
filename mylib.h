@@ -21,6 +21,8 @@ extern u16* videoBuffer;
 #define GREEN RGB(0,31,0)
 #define BLUE RGB(0,0,31)
 #define BLACK RGB(0,0,0)
+#define PURPLE RGB(12, 0, 25)
+#define ORANGE RGB(31, 12, 0)
 //rgb for beige 245, 241, 222
 #define BEIGE RGB(23, 21, 15)
 #define GRAY RGB(23, 23, 23)
@@ -50,13 +52,14 @@ extern u16* videoBuffer;
 #define BUTTON_R	(1<<8)
 #define BUTTON_L	(1<<9)
 
-#define KEY_DOWN_NOW(key)  (~(BUTTONS) & key)
-
 #define BUTTONS *(volatile unsigned int *)0x4000130
+
+#define KEY_DOWN_NOW(key)  (~(BUTTONS) & key)
 
 // *** Other =========================================================
 extern int num2lengthen;
-#define OFFSET(x, y, width) (x * width + y)
+#define OFFSET(x, y, width) (y * width + x)
+#define SIGN(x) ((x > 0) ? 1 : ((x < 0) ? -1 : 0)) 
 
 
 /* Direction Enum */
@@ -102,5 +105,7 @@ int hasEatenFood(node*);
 int isCollided(node*, u16);
 void updateSnakeDirection(snake*, direction);
 void placeFood(int, u16);
+void updateScore(int);
+char* int2str(int);
 
 #endif
