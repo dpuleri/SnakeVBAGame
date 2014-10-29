@@ -94,6 +94,28 @@ void plotLine(int x0, int y0, int x1, int y1, u16 color) {
     setPixel(x1, y1, color);
 }
 
+void initGame(snake* mysnake, u16 bgcolor) {
+    drawString(1, 5, "Score", GRAY);
+    updateScore(0);
+
+    /*//draw two lines in two different colors
+    //do this so the TAs give me da points...
+    plotLine(80, 0, MAX_X - 1, 15, PURPLE);
+    plotLine(80, 15, MAX_X - 1, 0, ORANGE);
+*/
+    REG_TM0D = -0X2000;
+    REG_TM0CNT = TM_FREQ_1024 | TM_ON | TM_IRQ;
+    //plotLine(12, 12, 50, 50, WHITE);
+    //draw background rectangle
+    drawRect(1, 16, MAX_X - 2, MAX_Y - 2 - 15, bgcolor);
+    //draw border rectangle
+    drawHollowRect(0, 15, MAX_X - 1, MAX_Y - 1 - 15, RED);
+
+    //init the snake and init food
+    initSnake(mysnake, GREEN, 3);
+    placeFood(mysnake->head->size, 0);
+}
+
 //var to count if the snake is being lengthened
 void moveSnake(snake* mysnake, u16 bgcolor) {
     static int hasCollided = 0;

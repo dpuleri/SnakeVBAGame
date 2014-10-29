@@ -1,38 +1,20 @@
 #include <stdlib.h>
 #include "mylib.h"
 #include "text.h"
+#include "titleScreen.h"
+
+void startTitleScreen();
 
 int main() {
 
     //set mode
     REG_DISPCTL = MODE3 | BG2_ENABLE;
+    startTitleScreen();
 
-    drawString(1, 5, "Score", GRAY);
-
-    //draw two lines in two different colors
-    //do this so the TAs give me da points...
-    plotLine(80, 0, MAX_X - 1, 15, PURPLE);
-    plotLine(80, 15, MAX_X - 1, 0, ORANGE);
-
-    u16 bgcolor = BEIGE;
     snake* mysnake = malloc(sizeof(*mysnake));
-    REG_TM0D = -0X2000;
-    REG_TM0CNT = TM_FREQ_1024 | TM_ON | TM_IRQ;
-    //plotLine(12, 12, 50, 50, WHITE);
-    //draw background rectangle
-    drawRect(1, 16, MAX_X - 2, MAX_Y - 2 - 15, bgcolor);
-    //draw border rectangle
-    drawHollowRect(0, 15, MAX_X - 1, MAX_Y - 1 - 15, RED);
-
-    //init the snake and init food
-    initSnake(mysnake, GREEN, 3);
-    placeFood(mysnake->head->size, 0);
+    u16 bgcolor = BEIGE;
+    initGame(mysnake, bgcolor); 
     while(1) {
-        /*if (REG_TM0D == 0) {
-            moveSnake(mysnake);
-            REG_TM0D = -0X2000;
-        }*/
-
         //default 50
         for (int i = 0; i < 50; i++) {
             while(SCANLINECOUNTER > 160);
@@ -50,4 +32,19 @@ int main() {
         moveSnake(mysnake, bgcolor);
     }
     return 0;
+}
+
+void startTitleScreen() {
+    for (int x = 0; x < MAX_X; x++) {
+        for (int y = 0; y < MAX_Y; y++) {
+            setPixel(x, y, titleScreen[OFFSET(x, y, MAX_X)]);
+        }
+    }
+    int pressedStart = 0;
+    while (!pressedStart) {
+        if (KEY_DOWN_NOW(BUTTON_START)) {
+            pressedStart++;
+        }
+    }
+    drawRect(0, 0, MAX_X - 1, MAX_Y - 1, BLACK);
 }
