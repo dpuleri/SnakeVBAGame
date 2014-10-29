@@ -1,0 +1,1 @@
+To play the game just play it like normal snake but with the arrow keys.
