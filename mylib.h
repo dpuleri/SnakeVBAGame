@@ -109,5 +109,8 @@ void updateSnakeDirection(snake*, direction);
 void placeFood(int, u16);
 void updateScore(int);
 char* int2str(int);
+void printScreen(const u16*);
+void waitForVBlank();
+void gameOver(snake*);
 
 #endif

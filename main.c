@@ -35,16 +35,18 @@ int main() {
 }
 
 void startTitleScreen() {
-    for (int x = 0; x < MAX_X; x++) {
+    /*for (int x = 0; x < MAX_X; x++) {
         for (int y = 0; y < MAX_Y; y++) {
             setPixel(x, y, titleScreen[OFFSET(x, y, MAX_X)]);
         }
-    }
+    }*/
+    printScreen(titleScreen);
     int pressedStart = 0;
     while (!pressedStart) {
         if (KEY_DOWN_NOW(BUTTON_START)) {
             pressedStart++;
         }
     }
+    waitForVBlank();
     drawRect(0, 0, MAX_X - 1, MAX_Y - 1, BLACK);
 }

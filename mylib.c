@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "mylib.h"
 #include "text.h"
+#include "endScreen.h"
 
 u16* videoBuffer = VID_BFFR; //define global var
 int num2lengthen = 0;
@@ -31,6 +32,7 @@ void initSnake(snake* mysnake, u16 color, int snakeSize) {
     mysnake->tail = prevNode;
     mysnake->color = color;
     mysnake->direction = right;
+    mysnake->length = 4;
 }
 
 void printSnakeNode(node* node) {
@@ -129,6 +131,7 @@ void moveSnake(snake* mysnake, u16 bgcolor) {
         nodeMoving = malloc(sizeof(*nodeMoving));
         nodeMoving->size = mysnake->head->size;
         num2lengthen--;
+        mysnake->length = mysnake->length + 1;
         if (!num2lengthen) {
             placeFood(mysnake->head->size, 0);
         }
@@ -162,7 +165,10 @@ void moveSnake(snake* mysnake, u16 bgcolor) {
         updateScore(score);
     } else if (isCollided(nodeMoving, bgcolor)) {
         nodeMoving->color = GRAY;
-        hasCollided = 1;
+        score = 0;
+        gameOver(mysnake); 
+        initGame(mysnake, bgcolor);
+        return;
     }
     printSnakeNode(nodeMoving);
 
@@ -216,6 +222,7 @@ void updateScore(int score) {
     drawRect(40, 5, 8 * 5, 7, BLACK);
     char* scoreStrPtr = int2str(score);
     drawString(40, 5, scoreStrPtr, WHITE);
+    free(scoreStrPtr);
 }
 
 char* int2str(int number) {
@@ -230,9 +237,38 @@ char* int2str(int number) {
     return buffer;
 }
 
+void printScreen(const u16* screen) {
+    waitForVBlank();
+    for (int x = 0; x < MAX_X; x++) {
+        for (int y = 0; y < MAX_Y; y++) {
+            setPixel(x, y, screen[OFFSET(x, y, MAX_X)]);
+        }
+    }
+}
 
+void waitForVBlank() {
+    while(SCANLINECOUNTER >= 160);
+    while(SCANLINECOUNTER < 160);
+}
 
-/*int main() {
-    printf("hello world");
-    return 0;
-}*/
+void gameOver(snake* mysnake) {
+    printScreen(endScreen);
+    int pressedKey = 0;
+    while (!pressedKey) {
+        if (KEY_DOWN_NOW(BUTTON_START)
+            || KEY_DOWN_NOW(BUTTON_L)
+            || KEY_DOWN_NOW(BUTTON_R)
+            || KEY_DOWN_NOW(BUTTON_SELECT)
+            || KEY_DOWN_NOW(BUTTON_UP)
+            || KEY_DOWN_NOW(BUTTON_DOWN)
+            || KEY_DOWN_NOW(BUTTON_LEFT)
+            || KEY_DOWN_NOW(BUTTON_RIGHT)
+            || KEY_DOWN_NOW(BUTTON_A)
+            || KEY_DOWN_NOW(BUTTON_B)) {
+            pressedKey++;
+        }
+    }
+
+    waitForVBlank();
+    drawRect(0, 0, MAX_X - 1, MAX_Y - 1, BLACK);
+}
