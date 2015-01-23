@@ -55,10 +55,11 @@ u16 getPixelColor(int x, int y) {
 }
 
 void drawRect(int x, int y, int width, int height, u16 color) {
-    for (int i = x; i < (x + width); i++) {
-        for (int j = y; j < (y + height); j++) {
-            setPixel(i, j, color);
-        }
+    volatile u16 clrptr = (volatile u16) color;
+    for (int j = y; j < (y + height); j++) {
+        DMA[3].src = &clrptr;
+        DMA[3].dst = &videoBuffer[OFFSET(x, j, MAX_X)];
+        DMA[3].cnt = width | DMA_SOURCE_FIXED | DMA_ON;
     }
 }
 
@@ -77,10 +78,10 @@ void plotLine(int x0, int y0, int x1, int y1, u16 color) {
     int dx = abs(x1 - x0);
     int sx = SIGN(x1 - x0);
     int dy = abs(y1 - y0);
-    int sy = SIGN(y1 - y0); 
+    int sy = SIGN(y1 - y0);
     int err = (dx > dy ? dx : (~dy + 1)) >> 1;
     int e2;
- 
+
     while (x0 != x1 || y0 != y1) {
         setPixel(x0, y0, color);
         e2 = err;
@@ -166,7 +167,7 @@ void moveSnake(snake* mysnake, u16 bgcolor) {
     } else if (isCollided(nodeMoving, bgcolor)) {
         nodeMoving->color = GRAY;
         score = 0;
-        gameOver(mysnake); 
+        gameOver(mysnake);
         initGame(mysnake, bgcolor);
         return;
     }
@@ -238,12 +239,9 @@ char* int2str(int number) {
 }
 
 void printScreen(const u16* screen) {
-    waitForVBlank();
-    for (int x = 0; x < MAX_X; x++) {
-        for (int y = 0; y < MAX_Y; y++) {
-            setPixel(x, y, screen[OFFSET(x, y, MAX_X)]);
-        }
-    }
+    DMA[3].src = screen;
+    DMA[3].dst = videoBuffer;
+    DMA[3].cnt = (MAX_X * MAX_Y) | DMA_ON;
 }
 
 void waitForVBlank() {
@@ -269,6 +267,11 @@ void gameOver(snake* mysnake) {
         }
     }
 
+    node* currNode = mysnake->head;
+    for (int i = 0; i < mysnake->length; i++) {
+        free(currNode);
+        currNode = currNode->next;
+    }
     waitForVBlank();
     drawRect(0, 0, MAX_X - 1, MAX_Y - 1, BLACK);
 }
