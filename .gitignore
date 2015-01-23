@@ -4,5 +4,7 @@
 *.elf
 *.gba
 *.zip
+*.jpg
+*.png
 /testing
 test
